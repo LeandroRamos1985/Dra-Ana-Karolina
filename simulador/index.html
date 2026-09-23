@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador: assistente de WhatsApp da Dra. Ana Karolina Lima</title>
+<meta name="description" content="Demonstração do assistente virtual de WhatsApp da Dra. Ana Karolina Lima, com atendimento em Brasília e Macapá.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23C81D63'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='26' font-weight='600' fill='%23fff'%3EAK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600&family=Albert+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#C81D63;--pink-deep:#9E1350;--blush:#FBEEF3;--rose:#F4D3E0;--plum:#2A1220;--ink:#231A20;--muted:#5E5058;--line:#EBD9E1;--paper:#FFFDFD;
+  --wa-bg:#EFE7DE;--wa-me:#D9FDD3;--wa-them:#FFFFFF;--wa-head:#1F2C34;
+  --display:"Bodoni Moda",Didot,Georgia,serif;--sans:"Albert Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root:not([data-theme="light"]){color-scheme:light}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%}
+body{margin:0;background:var(--blush);color:var(--ink);font:400 1rem/1.55 var(--sans)}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:6px}
+.page{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,40px);display:grid;grid-template-columns:1fr 400px 1fr;gap:clamp(20px,3vw,40px);align-items:start;min-height:100%}
+.intro h1{font:600 clamp(2rem,3.4vw,2.8rem)/1.05 var(--display);color:var(--plum);margin:0 0 14px;letter-spacing:-.02em}
+.intro p{color:var(--muted);margin:0 0 14px}
+.intro .tag{display:inline-block;background:var(--plum);color:#fff;font-weight:600;font-size:.85rem;padding:5px 12px;border-radius:999px;margin-bottom:16px}
+.intro ul{padding-left:1.1em;color:var(--muted);margin:0 0 18px}
+.intro li{margin-bottom:6px}
+.try{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:.93rem}
+.try strong{display:block;color:var(--plum);margin-bottom:6px}
+.try button{font:500 .9rem var(--sans);background:var(--blush);border:1px solid var(--rose);color:var(--pink-deep);border-radius:999px;padding:6px 12px;margin:0 6px 6px 0;cursor:pointer}
+.try button:hover{background:var(--rose)}
+
+/* telefone */
+.phone{background:var(--wa-bg);border-radius:28px;overflow:hidden;border:8px solid var(--plum);box-shadow:0 30px 60px rgba(42,18,32,.22);display:flex;flex-direction:column;height:min(760px,calc(100vh - 60px));min-height:560px}
+.wa-head{background:var(--wa-head);color:#fff;display:flex;align-items:center;gap:12px;padding:12px 14px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--pink);display:grid;place-items:center;font:600 1rem var(--display);flex:none}
+.wa-head b{display:block;font-weight:600;font-size:1rem;line-height:1.2}
+.wa-head small{color:#AEBAC1;font-size:.8rem}
+.reset{margin-left:auto;background:transparent;border:1px solid #3B4A54;color:#D1D7DB;border-radius:999px;font:500 .8rem var(--sans);padding:6px 10px;cursor:pointer}
+.chat{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:6px}
+.day{align-self:center;background:#FFF7D6;color:#54656F;font-size:.78rem;padding:4px 10px;border-radius:8px;margin-bottom:6px;text-align:center;max-width:90%}
+.msg{max-width:84%;padding:7px 10px 6px;border-radius:10px;font-size:.95rem;line-height:1.4;white-space:pre-line;box-shadow:0 1px .5px rgba(0,0,0,.13);position:relative;word-wrap:break-word}
+.msg time{display:block;text-align:right;font-size:.68rem;color:#667781;margin-top:2px}
+.them{align-self:flex-start;background:var(--wa-them);border-top-left-radius:2px}
+.me{align-self:flex-end;background:var(--wa-me);border-top-right-radius:2px}
+.typing{align-self:flex-start;background:#fff;border-radius:10px;padding:10px 14px;display:flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#A6B1B7;animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.35}30%{opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 10px;justify-content:flex-end}
+.chips button{font:500 .88rem var(--sans);background:#fff;color:#027EB5;border:1px solid #D1E7F0;border-radius:18px;padding:8px 12px;cursor:pointer;min-height:38px}
+.chips button:hover{background:#F0F8FB}
+.composer{display:flex;gap:8px;padding:8px 10px;background:#F0F2F5}
+.composer input{flex:1;font:400 1rem var(--sans);border:0;border-radius:22px;padding:11px 16px;min-height:44px;background:#fff;color:var(--ink)}
+.composer input:focus{outline:2px solid var(--pink)}
+.composer button{width:44px;height:44px;border-radius:50%;border:0;background:#00A884;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
+.composer button svg{width:20px;height:20px}
+
+/* painel */
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.panel h2{font:600 1.5rem/1.1 var(--display);color:var(--plum);margin:0 0 4px}
+.panel > p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.panel dl{margin:0}
+.panel dt{font-size:.8rem;color:var(--muted);margin-top:10px}
+.panel dd{margin:2px 0 0;font-weight:600;min-height:1.4em;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.panel dd.empty{color:#B9ABB2;font-weight:400}
+.panel dd.fresh{background:linear-gradient(90deg,var(--blush),transparent);transition:background 1.5s}
+.status{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--blush);color:var(--pink-deep);font-weight:600;font-size:.93rem}
+.status.ready{background:#E3F6EC;color:#12663E}
+.status.human{background:#FFF1D6;color:#7A4B00}
+.ai{margin-top:14px;font-size:.8rem;color:var(--muted)}
+.foot{grid-column:1/-1;text-align:center;font-size:.85rem;color:var(--muted);padding-bottom:10px}
+@media (max-width:1060px){.page{grid-template-columns:1fr 1fr}.intro{grid-column:1/-1}}
+@media (max-width:720px){.page{grid-template-columns:1fr;padding:12px}.phone{height:calc(100vh - 110px);height:calc(100dvh - 24px);border-width:0;border-radius:18px}.intro{order:2}.panel{order:3}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="intro">
+    <span class="tag">Demonstração</span>
+    <h1>Seu WhatsApp respondendo na hora, em Brasília e em Macapá</h1>
+    <p>Converse com o assistente como se fosse um paciente. Ele responde com as suas informações reais, entende em qual cidade a pessoa quer ser atendida e já deixa o pedido de avaliação pronto para a sua equipe confirmar.</p>
+    <ul>
+      <li>Responde 24 horas, inclusive quando a senhora está atendendo ou viajando</li>
+      <li>Tira dúvidas sobre SouSmile, clareamento, lentes e implantes</li>
+      <li>Não faz diagnóstico nem promete resultado</li>
+      <li>Passa para a equipe os casos de urgência ou que pedem uma pessoa</li>
+    </ul>
+    <div class="try"><strong>Experimente perguntar</strong>
+      <button type="button" data-ask="O clareamento dói?">O clareamento dói?</button>
+      <button type="button" data-ask="Quanto custa o SouSmile?">Quanto custa o SouSmile?</button>
+      <button type="button" data-ask="Vocês atendem sábado?">Vocês atendem sábado?</button>
+      <button type="button" data-ask="Quebrei um dente e está doendo muito">Quebrei um dente e está doendo</button>
+    </div>
+  </section>
+
+  <section class="phone" aria-label="Simulação de conversa no WhatsApp">
+    <header class="wa-head">
+      <span class="avatar" aria-hidden="true">AK</span>
+      <div><b>Dra. Ana Karolina Lima</b><small id="presence">Assistente virtual, online</small></div>
+      <button class="reset" type="button" id="reset">Recomeçar</button>
+    </header>
+    <div class="chat" id="chat" role="log" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form class="composer" id="composer" autocomplete="off">
+      <label for="text" class="sr" style="position:absolute;left:-9999px">Digite sua mensagem</label>
+      <input id="text" placeholder="Digite uma mensagem" maxlength="400">
+      <button type="submit" aria-label="Enviar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+    </form>
+  </section>
+
+  <aside class="panel" aria-label="Resumo que chega para a equipe">
+    <h2>O que a Dra. recebe</h2>
+    <p>Enquanto o paciente conversa, este resumo é montado automaticamente.</p>
+    <dl>
+      <dt>Cidade</dt><dd id="l-cidade" class="empty">aguardando</dd>
+      <dt>Tratamento de interesse</dt><dd id="l-trat" class="empty">aguardando</dd>
+      <dt>Dúvidas que o paciente tirou</dt><dd id="l-duvidas" class="empty">nenhuma ainda</dd>
+      <dt>Nome</dt><dd id="l-nome" class="empty">aguardando</dd>
+      <dt>Melhor período</dt><dd id="l-periodo" class="empty">aguardando</dd>
+    </dl>
+    <div class="status" id="status">Conversa em andamento</div>
+    <p class="ai" id="ai-note">Modo demonstração: nenhuma mensagem é enviada de verdade.</p>
+  </aside>
+  <p class="foot">Simulação criada pela Push IA. As respostas usam informações públicas da Dra. Ana Karolina Lima.</p>
+</div>
+
+<script>
+var INFO = {
+  brasilia:{nome:"Brasília", end:"SRTVS Quadra 701, Bloco B, Sala 701, Asa Sul", extra:"Também atendo no Riacho Fundo I, com datas combinadas pelo WhatsApp.", horario:"segunda a sexta, das 9h às 17h", tel:"(61) 99553-8421"},
+  macapa:{nome:"Macapá", end:"Av. Mendonça Furtado, 2278, Central", extra:"", horario:"segunda a sexta, das 8h às 18h", tel:"(96) 99142-1162"}
+};
+var TRAT = {
+  sousmile:{nome:"Alinhadores SouSmile", txt:"Os alinhadores SouSmile são placas transparentes e removíveis que alinham os dentes sem aparelho fixo. A Dra. Ana Karolina é unidade parceira premium da SouSmile em Macapá e também atende o tratamento em Brasília.\n\nTudo começa com uma pré-consulta: você tira suas dúvidas e, se houver indicação, faz o escaneamento digital dos dentes. Pela descrição da própria clínica, muitos tratamentos levam cerca de 8 meses, mas o prazo exato só sai depois da avaliação."},
+  clareamento:{nome:"Clareamento", txt:"O clareamento da Dra. Ana Karolina é planejado para ser sem sensibilidade: antes de começar, ela avalia dentes e gengiva e escolhe o protocolo certo para o seu caso, no consultório ou caseiro supervisionado."},
+  lentes:{nome:"Lentes em resina", txt:"As lentes em resina harmonizam a forma e a cor do sorriso, buscando um resultado natural. Na avaliação, a Dra. mostra se lentes em resina ou em porcelana combinam mais com o que você quer e com o seu orçamento."},
+  implante:{nome:"Implantes", txt:"Os implantes repõem dentes perdidos, devolvendo a estética e a mastigação. A Dra. Ana Karolina tem experiência em implantodontia e faz um planejamento para cada caso."}
+};
+var chat=document.getElementById("chat"), chipsEl=document.getElementById("chips"), input=document.getElementById("text");
+var S, sample=null, hist=[];
+function low(n){ return n.charAt(0).toLowerCase()+n.slice(1); }
+function now(){ var d=new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function scroll(){ chat.scrollTop=chat.scrollHeight; }
+function add(txt, who){ var m=document.createElement("div"); m.className="msg "+who; m.textContent=txt; var t=document.createElement("time"); t.textContent=now(); m.appendChild(t); chat.appendChild(m); scroll(); hist.push({role:who==="me"?"user":"assistant",content:txt}); if(hist.length>16) hist=hist.slice(-16); }
+function chips(list){ chipsEl.innerHTML=""; (list||[]).forEach(function(c){ var b=document.createElement("button"); b.type="button"; b.textContent=c[0]; b.onclick=function(){ user(c[0], c[1]); }; chipsEl.appendChild(b); }); scroll(); }
+function bot(msgs, next){ chips([]); var list=[].concat(msgs), i=0; (function step(){ if(i>=list.length){ chips(next); return; } var ty=document.createElement("div"); ty.className="typing"; ty.innerHTML="<i></i><i></i><i></i>"; chat.appendChild(ty); scroll(); setTimeout(function(){ ty.remove(); add(list[i++],"them"); step(); }, Math.min(1400, 450+list[i].length*6)); })(); }
+function set(id, val){ var el=document.getElementById(id); el.textContent=val; el.classList.remove("empty"); el.classList.add("fresh"); setTimeout(function(){ el.classList.remove("fresh"); },1500); }
+function duvida(d){ if(S.duvidas.indexOf(d)<0){ S.duvidas.push(d); set("l-duvidas", S.duvidas.join(", ")); } }
+function status(txt, cls){ var s=document.getElementById("status"); s.textContent=txt; s.className="status"+(cls?" "+cls:""); }
+
+var MENU=function(){ return [["Alinhadores SouSmile","t:sousmile"],["Clareamento","t:clareamento"],["Lentes em resina","t:lentes"],["Implantes","t:implante"],["Endereço e horário","info"]]; };
+var FOLLOW=function(){ return [["Dói?","q:dor"],["Quanto custa?","q:preco"],["Quanto tempo leva?","q:tempo"],["Quero agendar","agendar"]]; };
+
+function start(){
+  S={cidade:null, trat:null, duvidas:[], step:"cidade", nome:null};
+  chat.innerHTML='<div class="day">Hoje</div>'; hist=[];
+  ["l-cidade","l-trat","l-nome","l-periodo"].forEach(function(id){ var e=document.getElementById(id); e.textContent="aguardando"; e.classList.add("empty"); });
+  var d=document.getElementById("l-duvidas"); d.textContent="nenhuma ainda"; d.classList.add("empty");
+  status("Conversa em andamento");
+  bot(["Olá! 😊 Aqui é a assistente virtual da Dra. Ana Karolina Lima.","Para eu te ajudar direitinho: você quer ser atendido em qual cidade?"], [["Brasília","c:brasilia"],["Macapá","c:macapa"]]);
+}
+
+function setCidade(c){ S.cidade=c; set("l-cidade", INFO[c].nome); var I=INFO[c];
+  bot(["Perfeito! Em "+I.nome+", a Dra. atende na "+I.end+", "+I.horario+"."+(I.extra?" "+I.extra:""), "Sobre qual tratamento você quer saber?"], MENU()); S.step="menu"; }
+function setTrat(t){ S.trat=t; set("l-trat", TRAT[t].nome); duvida("como funciona"); bot([TRAT[t].txt, "Ficou alguma dúvida? Se quiser, já deixo sua avaliação encaminhada."], FOLLOW()); }
+function needCidade(then){ if(S.cidade) return false; S.pending=then; bot(["Antes, me conta: você quer ser atendido em Brasília ou em Macapá?"], [["Brasília","c:brasilia"],["Macapá","c:macapa"]]); return true; }
+
+function answer(q){
+  var t=S.trat?low(TRAT[S.trat].nome):"o tratamento";
+  if(q==="dor"){ duvida("se dói"); bot([S.trat==="clareamento"?"O protocolo da Dra. é pensado justamente para evitar sensibilidade. Ela avalia seus dentes antes e ajusta o tratamento para você. Cada pessoa reage de um jeito, por isso a avaliação é importante.":"Na maioria dos casos, "+t+" é bem tolerado, e a Dra. explica cada etapa antes de começar. Como cada caso é diferente, ela confirma tudo na avaliação."], FOLLOW()); }
+  else if(q==="preco"){ duvida("valores"); bot(["O valor depende do que a Dra. vai indicar para o seu caso, por isso ele é passado depois da avaliação, junto com as formas de pagamento.","Quer que eu já encaminhe sua avaliação?"], [["Quero agendar","agendar"],["Tenho outra dúvida","menu"]]); }
+  else if(q==="tempo"){ duvida("duração"); bot([S.trat==="sousmile"?"Pela descrição da clínica, muitos tratamentos com SouSmile levam cerca de 8 meses. O prazo exato do seu caso sai depois do escaneamento.":"O tempo varia de caso para caso. Na avaliação, a Dra. monta o plano e já te passa quantas sessões serão."], FOLLOW()); }
+}
+function agendar(){ if(needCidade("agendar")) return; S.step="nome"; bot(["Ótimo! Vou deixar sua avaliação encaminhada em "+INFO[S.cidade].nome+". Qual é o seu nome?"], []); input.focus(); }
+function periodo(p){ set("l-periodo", p); S.step="fim"; status("Pronto para a equipe confirmar o horário","ready");
+  bot(["Anotado, "+S.nome+"! Pedi sua avaliação"+(S.trat?" de "+low(TRAT[S.trat].nome):"")+" em "+INFO[S.cidade].nome+", no período da "+p.toLowerCase()+".","A equipe da Dra. Ana Karolina vai te confirmar o dia e o horário por aqui. Posso ajudar em mais alguma coisa?"], [["Endereço e horário","info"],["Não, obrigado","tchau"]]); }
+function human(){ status("Encaminhado para a equipe (urgência)","human"); duvida("urgência"); bot(["Sinto muito que você esteja com dor. Não consigo avaliar isso por mensagem, então já avisei a equipe da Dra. para falar com você o quanto antes.", S.cidade?"Se preferir ligar, o número de "+INFO[S.cidade].nome+" é "+INFO[S.cidade].tel+".":"Você está em Brasília ou em Macapá? Assim chamo a equipe certa."], S.cidade?[]:[["Brasília","c:brasilia"],["Macapá","c:macapa"]]); }
+
+function route(v){
+  if(v.indexOf("c:")===0){ setCidade(v.slice(2)); if(S.pending==="agendar"){ S.pending=null; setTimeout(agendar, 2600); } return; }
+  if(v.indexOf("t:")===0){ if(needCidade(null)){ S.trat=v.slice(2); set("l-trat", TRAT[S.trat].nome); return; } setTrat(v.slice(2)); return; }
+  if(v.indexOf("q:")===0){ answer(v.slice(2)); return; }
+  if(v.indexOf("p:")===0){ periodo(v.slice(2)); return; }
+  if(v==="agendar") return agendar();
+  if(v==="menu"){ bot(["Claro! Sobre o que você quer saber?"], MENU()); return; }
+  if(v==="info"){ if(needCidade(null)) return; var I=INFO[S.cidade]; duvida("endereço e horário"); bot(["📍 "+I.end+", "+I.nome+"\n🕘 "+I.horario+(I.extra?"\n"+I.extra:"")+"\n📞 "+I.tel], S.step==="fim"?[["Não, obrigado","tchau"]]:MENU()); return; }
+  if(v==="tchau"){ bot(["Eu que agradeço! Até logo. 💗"], [["Recomeçar a simulação","reset"]]); return; }
+  if(v==="reset"){ start(); }
+}
+
+function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function intent(txt){
+  var t=norm(txt);
+  if(/quebr|doendo muito|dor forte|sangr|inchad|urgen|emergen|caiu/.test(t)) return "human";
+  if(/brasilia|asa sul|riacho|\bdf\b/.test(t)) return "c:brasilia";
+  if(/macapa|amapa|\bap\b/.test(t)) return "c:macapa";
+  if(/sousmile|alinhador|invisivel|aparelho|torto/.test(t)) return /quanto custa|valor|preco/.test(t)?"sousmile+preco":"t:sousmile";
+  if(/clare|branc|amarel/.test(t)) return /doi|dor|sensib/.test(t)?"clareamento+dor":"t:clareamento";
+  if(/lente|faceta|resina/.test(t)) return "t:lentes";
+  if(/implant|perdi (o|um) dente|falta (um )?dente/.test(t)) return "t:implante";
+  if(/quanto custa|valor|preco|parcel|pagamento/.test(t)) return "q:preco";
+  if(/doi|dor|sensib|anestes/.test(t)) return "q:dor";
+  if(/quanto tempo|demora|meses|prazo/.test(t)) return "q:tempo";
+  if(/sabado|domingo|feriado/.test(t)) return "fds";
+  if(/convenio|plano de saude|plano odont/.test(t)) return "convenio";
+  if(/agend|marcar|consulta|avaliac|horario disponivel/.test(t)) return "agendar";
+  if(/endereco|onde fica|localiza|horario|funciona/.test(t)) return "info";
+  if(/^(oi|ola|bom dia|boa tarde|boa noite)/.test(t)) return "oi";
+  return null;
+}
+function free(txt){
+  if(S.step==="nome"){ S.nome=txt.trim().split(/\s+/).slice(0,2).map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase(); }).join(" "); set("l-nome", S.nome); S.step="periodo"; bot(["Prazer, "+S.nome.split(" ")[0]+"! Qual período fica melhor para você?"], [["Manhã","p:Manhã"],["Tarde","p:Tarde"]]); return; }
+  var it=intent(txt);
+  if(it==="human") return human();
+  if(it==="sousmile+preco"){ if(!S.trat){ S.trat="sousmile"; set("l-trat","Alinhadores SouSmile"); } return answer("preco"); }
+  if(it==="clareamento+dor"){ S.trat="clareamento"; set("l-trat","Clareamento"); return answer("dor"); }
+  if(it==="fds"){ duvida("atendimento no fim de semana"); if(needCidade(null)) return; return bot(["No momento, a Dra. atende em "+INFO[S.cidade].nome+" de "+INFO[S.cidade].horario+". Aos sábados não há atendimento, mas posso encaminhar sua avaliação para o horário que for melhor para você."], [["Quero agendar","agendar"],["Tenho outra dúvida","menu"]]); }
+  if(it==="convenio"){ duvida("convênio"); return bot(["Essa eu prefiro confirmar com a equipe, para não te passar informação errada. Já deixei anotado que você perguntou sobre convênio. Quer aproveitar e encaminhar sua avaliação?"], [["Quero agendar","agendar"],["Tenho outra dúvida","menu"]]); }
+  if(it==="oi") return bot(["Oi! 😊 Me conta como posso te ajudar."], S.cidade?MENU():[["Brasília","c:brasilia"],["Macapá","c:macapa"]]);
+  if(it) return route(it);
+  if(sample) return askAI(txt);
+  bot(["Essa pergunta eu vou deixar para a equipe da Dra. responder, para não te passar nada errado. Enquanto isso, posso te ajudar com um destes assuntos:"], MENU());
+}
+function user(txt, val){ chips([]); add(txt,"me"); if(val) route(val); else free(txt); }
+
+/* respostas com IA (somente quando aberto dentro do Claude) */
+function prompt(txt){
+  return [{role:"user",content:"Você é a assistente virtual de WhatsApp da Dra. Ana Karolina Lima, cirurgiã-dentista (CRO-AP 1207). Responda em português do Brasil, em tom acolhedor e curto (no máximo 3 frases, estilo WhatsApp, pode usar 1 emoji).\n\nFATOS (use somente estes; se não souber, diga que vai confirmar com a equipe):\n- Brasília: SRTVS Quadra 701, Bloco B, Sala 701, Asa Sul; seg a sex 9h às 17h; também atende no Riacho Fundo I com datas combinadas; tel (61) 99553-8421.\n- Macapá: Av. Mendonça Furtado, 2278, Central; seg a sex 8h às 18h; tel (96) 99142-1162.\n- Tratamentos: alinhadores SouSmile (unidade parceira premium em Macapá; muitos tratamentos levam cerca de 8 meses, prazo exato após escaneamento), clareamento sem sensibilidade (avaliação prévia), lentes em resina, implantes, laserterapia. Formação em Odontologia Hospitalar e habilitação em Laserterapia.\n- Nota 5,0 no Google nas duas cidades.\n\nREGRAS: nunca faça diagnóstico, nunca prometa resultado, nunca informe preços (o valor é passado após a avaliação), não peça dados de saúde. Em dor forte, sangramento ou trauma, diga que vai acionar a equipe imediatamente. Sempre que fizer sentido, ofereça encaminhar a avaliação.\n\nCidade escolhida: "+(S.cidade?INFO[S.cidade].nome:"ainda não informada")+". Tratamento de interesse: "+(S.trat?TRAT[S.trat].nome:"não informado")+".\n\nConversa recente:\n"+hist.slice(-8).map(function(h){ return (h.role==="user"?"Paciente: ":"Assistente: ")+h.content; }).join("\n")+"\n\nResponda somente com a próxima mensagem da assistente, sem aspas."}];
+}
+function askAI(txt){
+  var ty=document.createElement("div"); ty.className="typing"; ty.innerHTML="<i></i><i></i><i></i>"; chat.appendChild(ty); scroll();
+  sample(prompt(txt), {modelTier:"quick", cache:false}).then(function(r){ ty.remove(); add(r.text.trim(),"them"); duvida("pergunta livre"); chips(S.cidade?[["Quero agendar","agendar"],["Ver tratamentos","menu"]]:[["Brasília","c:brasilia"],["Macapá","c:macapa"]]); })
+  .catch(function(){ ty.remove(); sample=null; bot(["Essa pergunta eu vou deixar para a equipe da Dra. responder. Enquanto isso, posso te ajudar com um destes assuntos:"], MENU()); });
+}
+if(window.claude && claude.use){ claude.use("sample").then(function(s){ if(s){ sample=s; document.getElementById("ai-note").textContent="Modo demonstração com IA: perguntas livres são respondidas pela IA, dentro das regras da clínica. Nenhuma mensagem é enviada de verdade."; } }).catch(function(){}); }
+
+document.getElementById("composer").addEventListener("submit", function(e){ e.preventDefault(); var v=input.value.trim(); if(!v) return; input.value=""; user(v); });
+document.getElementById("reset").addEventListener("click", start);
+document.querySelectorAll("[data-ask]").forEach(function(b){ b.addEventListener("click", function(){ user(b.getAttribute("data-ask")); if(window.innerWidth<720) document.getElementById("chat").scrollIntoView({behavior:"smooth"}); }); });
+start();
+</script>
+</body>
+</html>
